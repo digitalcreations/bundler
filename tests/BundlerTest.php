@@ -37,7 +37,7 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
                     'js/test1.js',
                     [
                         'transform' => ['rot13'],
-                        'files' => ['js/test2.js']
+                        'parts' => ['js/test2.js']
                     ]
                 ]
             ]

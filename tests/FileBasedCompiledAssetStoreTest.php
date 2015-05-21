@@ -5,7 +5,7 @@ namespace DC\Tests\Bundler;
 class FileBasedCompiledAssetStoreTest extends \PHPUnit_Framework_TestCase {
     public function testConstructor_missingFolder_usesTempFolderSubdirectory() {
         $expectedFolder = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "dc_bundler";
-        rmdir($expectedFolder);
+        @rmdir($expectedFolder);
         new \DC\Bundler\FileBasedCompiledAssetStore();
         $this->assertTrue(is_dir($expectedFolder));
     }
