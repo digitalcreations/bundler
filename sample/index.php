@@ -7,14 +7,35 @@ $config =
         "__webroot" => pathinfo(__FILE__, PATHINFO_DIRNAME),
         "site.css" => [
             "transform" => ["bundle"],
-            "files" => [
+            "parts" => [
                 "app/styles/bootstrap.css",
-                "app/styles/local.css"
+                [
+                    "transform" => ["less"],
+                    "parts" => ["app/styles/local.less"]
+                ]
+            ]
+        ],
+        "site.js" => [
+            "transform" => ["bundle"],
+            "parts" => [
+                "app/scripts/angular.min.js",
+                [
+                    "transform" => ["jsmin"],
+                    "parts" => [
+                        "app/scripts/app.js"
+                    ]
+                ]
             ]
         ]
     ];
 
 $container = new \DC\IoC\Container();
+$container
+    ->register('\DC\Bundler\JSMin\JSMinTransformer')
+    ->to('\DC\Bundler\ITransformer');
+$container
+    ->register('\DC\Bundler\Less\LessTransformer')
+    ->to('\DC\Bundler\ITransformer');
 $container
     ->register(function() {
         // by providing no parameters, store files in system temp folder

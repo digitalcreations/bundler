@@ -4,8 +4,148 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3d3449ad659591fa0514fc0cf275da6b",
+    "hash": "42f1699d9252a007709091c9c47a5e00",
     "packages": [
+        {
+            "name": "dc/bundler",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/digitalcreations/bundler.git",
+                "reference": "8c1c3f6ad7e04e4d58e52affd6581001af6d968a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/digitalcreations/bundler/zipball/8c1c3f6ad7e04e4d58e52affd6581001af6d968a",
+                "reference": "8c1c3f6ad7e04e4d58e52affd6581001af6d968a",
+                "shasum": ""
+            },
+            "require": {
+                "dc/router": "0.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DC\\Bundler\\": "src/Bundler/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Digital Creations AS",
+                    "homepage": "http://www.digitalcreations.no",
+                    "role": "Company"
+                },
+                {
+                    "name": "Vegard Andreas Larsen",
+                    "homepage": "http://vega.rd.no",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Asset bundling for dc/router",
+            "homepage": "http://github.com/digitalcreations/bundler",
+            "time": "2015-05-21 10:45:35"
+        },
+        {
+            "name": "dc/bundler-jsmin",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/digitalcreations/bundler-jsmin.git",
+                "reference": "8a6b27b981f964cf5519a2f071381b86bfb4778e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/digitalcreations/bundler-jsmin/zipball/8a6b27b981f964cf5519a2f071381b86bfb4778e",
+                "reference": "8a6b27b981f964cf5519a2f071381b86bfb4778e",
+                "shasum": ""
+            },
+            "require": {
+                "dc/bundler": "dev-master",
+                "linkorb/jsmin-php": "1.*"
+            },
+            "suggest": {
+                "dc/ioc": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DC\\Bundler\\JSMin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Digital Creations AS",
+                    "homepage": "http://www.digitalcreations.no",
+                    "role": "Company"
+                },
+                {
+                    "name": "Vegard Andreas Larsen",
+                    "homepage": "http://vega.rd.no",
+                    "role": "Developer"
+                }
+            ],
+            "description": "JSMin support for dc/bundler",
+            "homepage": "http://github.com/digitalcreations/bundler-jsmin",
+            "time": "2015-05-21 12:39:01"
+        },
+        {
+            "name": "dc/bundler-less",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/digitalcreations/bundler-less.git",
+                "reference": "a7b9144f328868c58a571c0462dba28660cddc62"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/digitalcreations/bundler-less/zipball/a7b9144f328868c58a571c0462dba28660cddc62",
+                "reference": "a7b9144f328868c58a571c0462dba28660cddc62",
+                "shasum": ""
+            },
+            "require": {
+                "dc/bundler": "dev-master",
+                "oyejorge/less.php": "1.*"
+            },
+            "suggest": {
+                "dc/ioc": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DC\\Bundler\\Less\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Digital Creations AS",
+                    "homepage": "http://www.digitalcreations.no",
+                    "role": "Company"
+                },
+                {
+                    "name": "Vegard Andreas Larsen",
+                    "homepage": "http://vega.rd.no",
+                    "role": "Developer"
+                }
+            ],
+            "description": "LESS support for dc/bundler",
+            "homepage": "http://github.com/digitalcreations/bundler-less",
+            "time": "2015-05-21 11:55:06"
+        },
         {
             "name": "dc/ioc",
             "version": "0.1.3",
@@ -113,6 +253,122 @@
             "time": "2014-11-20 08:20:05"
         },
         {
+            "name": "linkorb/jsmin-php",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/linkorb/jsmin-php.git",
+                "reference": "be85d87fc9c27730e7e9ced742b13010dafc1026"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/linkorb/jsmin-php/zipball/be85d87fc9c27730e7e9ced742b13010dafc1026",
+                "reference": "be85d87fc9c27730e7e9ced742b13010dafc1026",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joost Faassen",
+                    "email": "j.faassen@linkorb.com",
+                    "role": "Packaging for composer"
+                },
+                {
+                    "name": "Ryan Grove",
+                    "email": "ryan@wonko.com",
+                    "role": "PHP port"
+                },
+                {
+                    "name": "Adam Gofort",
+                    "email": "aag@adamgoforth.com",
+                    "role": "Updates to the PHP port"
+                },
+                {
+                    "name": "Douglas Crockford",
+                    "email": "douglas@crockford.com"
+                }
+            ],
+            "description": "Unofficial package of jsmin-php",
+            "homepage": "http://www.github.com/linkorb/jsmin-php",
+            "keywords": [
+                "javascript",
+                "jsmin",
+                "minify"
+            ],
+            "time": "2013-03-15 13:16:35"
+        },
+        {
+            "name": "oyejorge/less.php",
+            "version": "v1.7.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oyejorge/less.php.git",
+                "reference": "6e08ecb07e6f6d9170c23e8744c58fdd822ad0de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oyejorge/less.php/zipball/6e08ecb07e6f6d9170c23e8744c58fdd822ad0de",
+                "reference": "6e08ecb07e6f6d9170c23e8744c58fdd822ad0de",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "bin": [
+                "bin/lessc"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Less": "lib/"
+                },
+                "classmap": [
+                    "lessc.inc.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Agar",
+                    "homepage": "https://github.com/agar"
+                },
+                {
+                    "name": "Martin Jantošovič",
+                    "homepage": "https://github.com/Mordred"
+                },
+                {
+                    "name": "Josh Schmidt",
+                    "homepage": "https://github.com/oyejorge"
+                }
+            ],
+            "description": "PHP port of the Javascript version of LESS http://lesscss.org",
+            "homepage": "http://lessphp.gpeasy.com",
+            "keywords": [
+                "css",
+                "less",
+                "less.js",
+                "lesscss",
+                "php",
+                "stylesheet"
+            ],
+            "time": "2015-03-10 18:12:59"
+        },
+        {
             "name": "willdurand/negotiation",
             "version": "1.3.4",
             "source": {
@@ -165,7 +421,11 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dc/bundler": 20,
+        "dc/bundler-less": 20,
+        "dc/bundler-jsmin": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

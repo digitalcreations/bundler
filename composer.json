@@ -34,7 +34,8 @@
         "phpunit/phpunit": "4.0.*"
     },
     "require": {
-        "dc/router": "0.*"
+        "dc/router": "*",
+        "dflydev/apache-mime-types": "*"
     },
     "suggests": {
         "dc/ioc": "0.*"

@@ -104,7 +104,7 @@ class Bundler {
         }
         $outputText = array_map(function(Content $c) { return $c->getContent(); }, $contents);
         $types = array_values(array_unique(array_map(function(Content $c) { return $c->getContentType(); }, $contents)));
-        if (count($types) > 1) {
+        if (count($types) !== 1) {
             throw new InvalidConfigurationException("Nodes have different content types, cannot merge.");
         }
         return new Content($types[0], implode('', $outputText));
@@ -126,7 +126,8 @@ class Bundler {
         // load contents of all files (and compile subgroups as necessary)
         foreach ($files as $file) {
             if (is_string($file)) {
-                $contents[$file] = new Content("text/plain", file_get_contents($file));
+                $mimeRepos = new \Dflydev\ApacheMimeTypes\FlatRepository();
+                $contents[$file] = new Content($mimeRepos->findType(pathinfo($file, PATHINFO_EXTENSION)), file_get_contents($file));
             }
             else {
                 $contents[sha1(microtime())] = $this->getContentInternal($file);

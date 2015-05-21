@@ -1,18 +1,16 @@
 {
-    "name": "root/sample",
-    "require": {
-        "dc/router": "^0.1.3",
-        "dc/ioc": "^0.1.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "DC\\Bundler\\": "../src/Bundler"
-        }
-    },
+    "name": "dc/bundler-sample",
     "authors": [
         {
             "name": "Vegard Larsen",
             "email": "vegard@digitalcreations.no"
         }
-    ]
+    ],
+    "require": {
+        "dc/router": "^0.1.3",
+        "dc/ioc": "^0.1.3",
+        "dc/bundler": "dev-master",
+        "dc/bundler-less": "dev-master",
+        "dc/bundler-jsmin": "dev-master"
+    }
 }
