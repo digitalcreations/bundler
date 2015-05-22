@@ -20,6 +20,7 @@ class BundleController extends \DC\Router\ControllerBase {
      */
     public function get($name, $file) {
         $content = $this->bundler->compile($name);
+        $file = ltrim($file, DIRECTORY_SEPARATOR);
         $isDebug = $this->bundler->getMode() == Mode::Debug;
         if (count($content) == 1 && !$isDebug) {
             $content = $content[0];
