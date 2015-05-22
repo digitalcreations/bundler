@@ -53,7 +53,7 @@ class Bundler {
         }
     }
 
-    private function getFileListInternal($bundle, $recursive = true) {
+    private function getFileListInternal($bundle, $recursive = true, $includeWatch = false) {
         $files = [];
         if (is_array($bundle[Node::Parts])) {
             foreach ($bundle[Node::Parts] as $pattern) {
@@ -66,17 +66,30 @@ class Bundler {
                 elseif (is_array($pattern) && !$recursive) {
                     $patternFiles = [$pattern];
                 }
+
                 if (count($patternFiles) == 0) {
                     trigger_error("Requested file $pattern matched no files on disk", E_USER_WARNING);
                 }
                 $files = array_merge($files, $patternFiles);
             }
         }
+
+        if ($includeWatch && isset($bundle[Node::Watch]) && is_array($bundle[Node::Watch])) {
+            foreach ($bundle[Node::Watch] as $pattern) {
+                $files = array_merge($files, glob($this->config[Node::WebRoot] .'/'. $pattern));
+            }
+        }
+
+        if ($recursive) return array_unique($files);
         return $files;
     }
 
     public function getFileListForBundle($name) {
         return $this->getFileListInternal($this->config[$name]);
+    }
+
+    private function getFileListForWatch($name) {
+        return $this->getFileListInternal($this->config[$name], true, true);
     }
 
     public function needsRecompile($name) {
@@ -88,7 +101,7 @@ class Bundler {
             return true;
         }
 
-        $files = $this->getFileListForBundle($name);
+        $files = $this->getFileListForWatch($name);
         $latestModified = max(array_map(function($x) { return filemtime($x); }, $files));
         return $latestModified > $saved->getTimestamp();
     }

@@ -9,4 +9,5 @@ class Node {
     const Parts = "parts";
     const Transform = "transform";
     const WebRoot = "__webroot";
+    const Watch = "watch";
 }

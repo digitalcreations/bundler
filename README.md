@@ -66,6 +66,9 @@ The configuration should have the following structure:
         ],
         "parts" => [
             // array of file names or other bundles to process
+        ],
+        "watch" => [
+            // array of file names to watch for recompile
         ]
     ]
 ]
@@ -83,6 +86,11 @@ When including files you specify a `glob` expression relative to the web root. H
 - `app/app.js` &mdash; just the `app.js` file in the `app` directory.
 - `app/directives/*.js' &mdash; all `.js` files in `app/directives`. You knew that already.
 - `app/templates/**/*.html` &mdash; all `.html` files in any subfolder of `app/templates`. 
+
+The **watch** specifies additional files to be watched for changes to determine if the bundle needs to be recompiled.
+This is useful for e.g. Less files, where `@import` statements are not visible to Bundler. Then it would help if you
+added a `watch` glob that matches all files in a specific subfolder. If any of those files change, the bundle is 
+recompiled.
 
 The **transforms** specify which transformations should be done on the items in this bundle. Each transform has a name, 
 and all of these come as their own Composer package):

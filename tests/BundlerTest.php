@@ -6,6 +6,8 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
     protected function setUp()
     {
         $this->root = pathinfo(__FILE__, PATHINFO_DIRNAME) . '/assets';
+        touch($this->root . '/js/test1.js', time() - 7200); // two hours old
+        touch($this->root . '/js/test2.js', time() - 3600); // one hour old
         parent::setUp();
     }
 
@@ -39,6 +41,14 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
                         'transform' => ['rot13'],
                         'parts' => ['js/test2.js']
                     ]
+                ]
+            ],
+            'withWatch' => [
+                "parts" => [
+                    "js/test1.js"
+                ],
+                "watch" => [
+                    "js/test2.js"
                 ]
             ]
         ];
@@ -97,6 +107,19 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
         $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
 
         $this->assertFalse($bundler->needsRecompile('completeGlob'));
+    }
+
+    public function testNeedsRecompile_watchChanged_returnsTrue() {
+        $time = new \DateTime();
+        $time->setTimestamp(time() - 5400); // 90 minutes ago
+        $mockAssetStore = $this->getMock('\DC\Bundler\ICompiledAssetStore');
+        $mockAssetStore
+            ->expects($this->once())
+            ->method('getSaveTime')
+            ->willReturn($time);
+        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
+
+        $this->assertTrue($bundler->needsRecompile('withWatch'));
     }
 
     public function testGetContent_needsRecompile_isBundledAndReturned() {
