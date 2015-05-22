@@ -6,6 +6,9 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
     protected function setUp()
     {
         $this->root = pathinfo(__FILE__, PATHINFO_DIRNAME) . '/assets';
+        if (!is_dir($this->root . '/compiled')) {
+            mkdir($this->root . '/compiled');
+        }
         touch($this->root . '/js/test1.js', time() - 7200); // two hours old
         touch($this->root . '/js/test2.js', time() - 3600); // one hour old
         parent::setUp();
@@ -55,7 +58,7 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \PHPUnit_Framework_Error
      */
     public function testGetFileListForBundle_missingFileTriggersWarning() {
         $bundler = new \DC\Bundler\Bundler($this->getTestBundles());
