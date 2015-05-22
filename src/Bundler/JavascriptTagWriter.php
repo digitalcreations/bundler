@@ -18,6 +18,6 @@ class JavascriptTagWriter implements ITagWriter {
      */
     function getTagForPath($path)
     {
-        return '<script src="' . htmlentities($path) . '" />';
+        return '<script src="' . htmlentities($path) . '"></script>';
     }
 }
