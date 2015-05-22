@@ -5,8 +5,10 @@ namespace DC\Bundler;
 use DC\Bundler\Exceptions\InvalidConfigurationException;
 
 class Bundler {
+    /**
+     * @var BundlerConfiguration
+     */
     private $config;
-    private $mode;
     /**
      * @var ICompiledAssetStore
      */
@@ -15,31 +17,25 @@ class Bundler {
      * @var array|ITransformer[]
      */
     private $transformers;
+    /**
+     * @var array|ITagWriter[]
+     */
+    private $tagWriters;
 
     /**
-     * @param array|string $config The configuration array or a path to a JSON file
-     * @param int $mode See \DC\Bundler\Mode
-     * @param ICompiledAssetStore $assetStore
-     * @param ITransformer[] $transformers
+     * @param $config \DC\Bundler\BundlerConfiguration The configuration
+     * @param $assetStore \DC\Bundler\ICompiledAssetStore
+     * @param $transformers \DC\Bundler\ITransformer[]
+     * @param $tagWriters \DC\Bundler\ITagWriter[]
      * @throws Exceptions\InvalidConfigurationException
      */
-    function __construct($config,
-                         $mode = Mode::Debug,
+    function __construct(BundlerConfiguration $config,
                          ICompiledAssetStore $assetStore = null,
-                         array $transformers = null)
+                         array $transformers = null,
+                         array $tagWriters = null)
     {
-        $this->mode = $mode;
-        if (is_array($config)) {
-            $this->config = $config;
-        }
-        elseif (is_string($config) && file_exists($config)) {
-            $json = file_get_contents($config);
-            $this->config = json_decode($json);
-        }
+        $this->config = $config;
 
-        if (!isset($this->config[Node::WebRoot])) {
-            throw new \DC\Bundler\Exceptions\InvalidConfigurationException("Could not locate root folder. Add __webroot to configuration.");
-        }
         $this->assetStore = $assetStore;
         if ($assetStore == null) {
             $this->assetStore = new FileBasedCompiledAssetStore();
@@ -51,6 +47,25 @@ class Bundler {
                 $this->transformers[strtolower($transformer->getName())] = $transformer;
             }
         }
+
+        $this->tagWriters = [];
+        if (!is_array($tagWriters)) {
+            $tagWriters = [new JavascriptTagWriter(), new StylesheetTagWriter()];
+        }
+        array_walk($tagWriters, function(ITagWriter $tagWriter) {
+            $types = $tagWriter->getSupportedContentTypes();
+            array_walk($types, function($type) use ($tagWriter) {
+                $this->tagWriters[$type] = $tagWriter;
+            });
+        });
+    }
+
+    public function getMode() {
+        return $this->config->getMode();
+    }
+
+    public function getWebroot() {
+        return $this->config->getBundles()[Node::WebRoot];
     }
 
     private function getFileListInternal($bundle, $recursive = true, $includeWatch = false) {
@@ -58,7 +73,7 @@ class Bundler {
         if (is_array($bundle[Node::Parts])) {
             foreach ($bundle[Node::Parts] as $pattern) {
                 if (is_string($pattern)) {
-                    $patternFiles = glob($this->config[Node::WebRoot] .'/'. $pattern);
+                    $patternFiles = glob($this->getWebroot() .'/'. $pattern);
                 }
                 elseif (is_array($pattern) && $recursive) {
                     $patternFiles = $this->getFileListInternal($pattern);
@@ -76,7 +91,7 @@ class Bundler {
 
         if ($includeWatch && isset($bundle[Node::Watch]) && is_array($bundle[Node::Watch])) {
             foreach ($bundle[Node::Watch] as $pattern) {
-                $files = array_merge($files, glob($this->config[Node::WebRoot] .'/'. $pattern));
+                $files = array_merge($files, glob($this->getWebroot() .'/'. $pattern));
             }
         }
 
@@ -85,18 +100,22 @@ class Bundler {
     }
 
     public function getFileListForBundle($name) {
-        return $this->getFileListInternal($this->config[$name]);
+        return $this->getFileListInternal($this->config->getBundles()[$name]);
     }
 
     private function getFileListForWatch($name) {
-        return $this->getFileListInternal($this->config[$name], true, true);
+        return $this->getFileListInternal($this->config->getBundles()[$name], true, true);
+    }
+
+    private function getSaveName($name) {
+        return $this->config->getMode() . $name;
     }
 
     public function needsRecompile($name) {
         /**
          * @var \DateTime $saved
          */
-        $saved = $this->assetStore->getSaveTime($name);
+        $saved = $this->assetStore->getSaveTime($this->getSaveName($name));
         if ($saved == null) {
             return true;
         }
@@ -104,6 +123,19 @@ class Bundler {
         $files = $this->getFileListForWatch($name);
         $latestModified = max(array_map(function($x) { return filemtime($x); }, $files));
         return $latestModified > $saved->getTimestamp();
+    }
+
+    private static function flatten(array $array) {
+        $result = array();
+        foreach($array as $key=>$value) {
+            if(is_array($value)) {
+                $result = $result + self::flatten($value);
+            }
+            else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -115,8 +147,9 @@ class Bundler {
         if (count($contents) == 0 || $contents == null) {
             return null;
         }
-        $outputText = array_map(function(Content $c) { return $c->getContent(); }, $contents);
-        $types = array_values(array_unique(array_map(function(Content $c) { return $c->getContentType(); }, $contents)));
+        $flatContents = self::flatten($contents);
+        $outputText = array_map(function(Content $c) { return $c->getContent(); }, $flatContents);
+        $types = array_values(array_unique(array_map(function(Content $c) { return $c->getContentType(); }, $flatContents)));
         if (count($types) !== 1) {
             throw new InvalidConfigurationException("Nodes have different content types, cannot merge.");
         }
@@ -133,6 +166,7 @@ class Bundler {
         else {
             $transform = $node[Node::Transform];
         }
+        $isDebug = $this->getMode() == Mode::Debug;
 
         $files = $this->getFileListInternal($node, false);
         $contents = [];
@@ -140,7 +174,7 @@ class Bundler {
         foreach ($files as $file) {
             if (is_string($file)) {
                 $mimeRepos = new \Dflydev\ApacheMimeTypes\FlatRepository();
-                $contents[$file] = new Content($mimeRepos->findType(pathinfo($file, PATHINFO_EXTENSION)), file_get_contents($file));
+                $contents[$file] = new Content($mimeRepos->findType(pathinfo($file, PATHINFO_EXTENSION)), file_get_contents($file), false);
             }
             else {
                 $contents[sha1(microtime())] = $this->getContentInternal($file);
@@ -149,26 +183,65 @@ class Bundler {
 
         // apply transforms to our files
         foreach ($transform as $transformName) {
-            if ($transformName == "bundle") {
+            if (!$isDebug && $transformName == "bundle") {
                 $contents = [$this->mergeContentsInternal($contents)];
             }
-            else {
+            elseif (isset($this->transformers[$transformName])) {
                 $transformer = $this->transformers[$transformName];
+                if ($isDebug && !$transformer->runInDebugMode()) {
+                    continue;
+                }
                 foreach ($contents as $file => $content) {
                     $contents[$file] = $transformer->transform($content, $file);
                 }
             }
         }
 
-        return $this->mergeContentsInternal($contents);
+        return $isDebug ? $contents : [$this->mergeContentsInternal($contents)];
     }
 
+    public function getTagsForBundle($name) {
+        $content = $this->compile($name);
+        $tags = [];
+        if ($this->getMode() == Mode::Debug) {
+            foreach ($content as $path => $c) {
+                $path = str_replace($this->getWebroot(), '', $path);
+                if ($c->wasCompiled()) {
+                    $path = '/bundle/' . $this->config->getCacheBreaker() . '/' . $name .'?part=' . htmlentities($path);
+                }
+                $tagWriter = $this->tagWriters[$c->getContentType()];
+                $tags[] = $tagWriter->getTagForPath($path);
+            }
+        }
+        else {
+            $path = '/bundle/' . $this->config->getCacheBreaker() . '/' . $name;
+            $tagWriter = $this->tagWriters[$content[0]->getContentType()];
+            return $tagWriter->getTagForPath($path);
+        }
+        return implode("\n", $tags);
+    }
+
+    /**
+     * @param $name
+     * @return Content[]
+     */
     public function compile($name) {
         if ($this->needsRecompile($name)) {
-            $content = $this->getContentInternal($this->config[$name]);
-            $this->assetStore->save($name, $content);
+            $content = self::flatten($this->getContentInternal($this->config->getBundles()[$name]));
+            $this->assetStore->save($this->getSaveName($name), $content);
             return $content;
         }
-        return $this->assetStore->get($name);
+        return $this->assetStore->get($this->getSaveName($name));
+    }
+
+    public static function registerWithContainer(\DC\IoC\Container $container, BundlerConfiguration $config) {
+        $container->register(function() {
+                // by providing no parameters, store files in system temp folder
+                return new \DC\Bundler\FileBasedCompiledAssetStore();
+            })
+            ->to('\DC\Bundler\ICompiledAssetStore');
+        $container->register('\DC\Bundler\JavascriptTagWriter')->to('\DC\Bundler\ITagWriter');
+        $container->register('\DC\Bundler\StylesheetTagWriter')->to('\DC\Bundler\ITagWriter');
+        $container->register($config);
     }
 } 

@@ -10,14 +10,14 @@ namespace DC\Bundler;
 interface ICompiledAssetStore {
     /**
      * @param string $name
-     * @param \DC\Bundler\Content $content
+     * @param \DC\Bundler\Content[] $content
      * @return void
      */
-    function save($name, Content $content);
+    function save($name, array $content);
 
     /**
      * @param string $name
-     * @return \DC\Bundler\Content
+     * @return \DC\Bundler\Content[]
      */
     function get($name);
 

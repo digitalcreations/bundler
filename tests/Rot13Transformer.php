@@ -15,10 +15,18 @@ class Rot13Transformer implements \DC\Bundler\ITransformer {
     }
 
     /**
-     * @return string The MIME type this outputs (e.g. application/javascript)
+     * @inheritdoc
      */
     function getOutputContentType()
     {
         return "application/javascript";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function runInDebugMode()
+    {
+        return true;
     }
 }

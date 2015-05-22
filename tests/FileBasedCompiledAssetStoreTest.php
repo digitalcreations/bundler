@@ -14,10 +14,10 @@ class FileBasedCompiledAssetStoreTest extends \PHPUnit_Framework_TestCase {
         $folder = pathinfo(__FILE__, PATHINFO_DIRNAME) . '/assets/compiled';
         $content = new \DC\Bundler\Content("text/plain", "abc123");
         $store = new \DC\Bundler\FileBasedCompiledAssetStore($folder);
-        $store->save('test', $content);
+        $store->save('test', [$content]);
         $this->assertEquals(filemtime($folder . DIRECTORY_SEPARATOR . 'test'), $store->getSaveTime('test')->getTimestamp());
-        $this->assertEquals('abc123', $store->get('test')->getContent());
-        $this->assertEquals('text/plain', $store->get('test')->getContentType());
+        $this->assertEquals('abc123', $store->get('test')[0]->getContent());
+        $this->assertEquals('text/plain', $store->get('test')[0]->getContentType());
         unlink($folder . DIRECTORY_SEPARATOR . 'test');
     }
 } 

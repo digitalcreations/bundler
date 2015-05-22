@@ -2,6 +2,8 @@
 
 namespace DC\Tests\Bundler;
 
+use DC\Bundler\BundlerConfiguration;
+
 class BundlerTest extends \PHPUnit_Framework_TestCase {
     protected function setUp()
     {
@@ -61,19 +63,22 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \PHPUnit_Framework_Error
      */
     public function testGetFileListForBundle_missingFileTriggersWarning() {
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles());
+        $bundler = new \DC\Bundler\Bundler(
+            new BundlerConfiguration($this->getTestBundles()));
         $bundler->getFileListForBundle('missing');
     }
 
     public function testGetFileListForBundle_ReturnsCorrectList() {
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles());
+        $bundler = new \DC\Bundler\Bundler(
+            new BundlerConfiguration($this->getTestBundles()));
         $files = $bundler->getFileListForBundle('completeGlob');
         $this->assertContains($this->root . "/js/test1.js", $files);
         $this->assertContains($this->root . "/js/test2.js", $files);
     }
 
     public function testGetFileListForBundle_nestedBundle_returnsCorrectList() {
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles());
+        $bundler = new \DC\Bundler\Bundler(
+            new BundlerConfiguration($this->getTestBundles()));
         $files = $bundler->getFileListForBundle('withNestedTransform');
         $this->assertContains($this->root . "/js/test1.js", $files);
         $this->assertContains($this->root . "/js/test2.js", $files);
@@ -85,7 +90,9 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->expects($this->once())
             ->method('getSaveTime')
             ->willReturn(null);
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Debug),
+            $mockAssetStore);
 
         $this->assertTrue($bundler->needsRecompile('completeGlob'));
     }
@@ -96,7 +103,9 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->expects($this->once())
             ->method('getSaveTime')
             ->willReturn(new \DateTime('2015-01-01'));
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Debug),
+            $mockAssetStore);
 
         $this->assertTrue($bundler->needsRecompile('completeGlob'));
     }
@@ -107,7 +116,9 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->expects($this->once())
             ->method('getSaveTime')
             ->willReturn(new \DateTime());
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Debug),
+            $mockAssetStore);
 
         $this->assertFalse($bundler->needsRecompile('completeGlob'));
     }
@@ -120,7 +131,9 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->expects($this->once())
             ->method('getSaveTime')
             ->willReturn($time);
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Debug),
+            $mockAssetStore);
 
         $this->assertTrue($bundler->needsRecompile('withWatch'));
     }
@@ -132,9 +145,12 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->method('getSaveTime')
             ->willReturn(new \DateTime('2015-01-01'));
 
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore, []);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Production),
+            $mockAssetStore,
+            []);
         $content = $bundler->compile('completeGlob');
-        $this->assertEquals("console.log('test1.js');console.log('test2.js');", $content->getContent());
+        $this->assertEquals("console.log('test1.js');console.log('test2.js');", $content[0]->getContent());
     }
 
     public function testGetContent_needsRecompile_isCompiledBundledAndReturned() {
@@ -144,9 +160,12 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->method('getSaveTime')
             ->willReturn(new \DateTime('2015-01-01'));
 
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore, [new Rot13Transformer()]);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Production),
+            $mockAssetStore,
+            [new Rot13Transformer()]);
         $content = $bundler->compile('withTransform');
-        $this->assertEquals("pbafbyr.ybt('grfg1.wf');", $content->getContent());
+        $this->assertEquals("pbafbyr.ybt('grfg1.wf');", $content[0]->getContent());
     }
 
     public function testGetContent_nestedContent_isCompiledBundledAndReturned() {
@@ -156,8 +175,11 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             ->method('getSaveTime')
             ->willReturn(new \DateTime('2015-01-01'));
 
-        $bundler = new \DC\Bundler\Bundler($this->getTestBundles(), \DC\Bundler\Mode::Debug, $mockAssetStore, [new Rot13Transformer()]);
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Production),
+            $mockAssetStore,
+            [new Rot13Transformer()]);
         $content = $bundler->compile('withNestedTransform');
-        $this->assertEquals("console.log('test1.js');pbafbyr.ybt('grfg2.wf');", $content->getContent());
+        $this->assertEquals("console.log('test1.js');pbafbyr.ybt('grfg2.wf');", $content[0]->getContent());
     }
 }

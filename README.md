@@ -21,25 +21,13 @@ or in `composer.json`
 This package depends on `dc/router` but also strongly suggests `dc/ioc`. The samples below assume both are installed.
 
 ```php
-$container
-    ->register(function() {
-        // by providing no parameters, store files in system temp folder
-        return new \DC\Bundler\FileBasedCompiledAssetStore();
-    })
-    ->to('\DC\Bundler\ICompiledAssetStore');
-$container
-    ->register(
-        /**
-         * @param $transformers \DC\Bundler\ITransformer[]
-         */
-        function(\DC\Bundler\ICompiledAssetStore $assetStore, array $transformers) use ($config) {
-            return new \DC\Bundler\Bundler(
-                $config, // see the Configuration section
-                \DC\Bundler\Mode::Debug,
-                $assetStore,
-                $transformers);
-        })
-    ->to('\DC\Bundler\Bundler');
+\DC\Bundler\Bundler::registerWithContainer(
+    $container,
+    new \DC\Bundler\BundlerConfiguration(
+        $config, // see the configuration section
+        \DC\Bundler\Mode::Production, 
+        "bar")
+    );
 ```
 
 ## Compiled asset store
@@ -47,8 +35,8 @@ $container
 This is an interface you can implement yourself to choose where the compiled files are stored. It is a very simple 
 interface.
 
-The built in implementation (`FileBasedCompiledAssetStore`) by default stores the files in the `/tmp/bundler` on Linux,
-and `C:\Windows\temp\bundler` on Windows. When registering it, pass the folder you want to use to its constructor.
+The built in implementation (`FileBasedCompiledAssetStore`) by default stores the files in the `/tmp/dc_bundler` on Linux,
+and `C:\Windows\temp\dc_bundler` on Windows. When registering it, pass the folder you want to use to its constructor.
 
 ## Configuration
 
@@ -150,3 +138,42 @@ your app directly. The URL is `/bundle/{cacheBreaker}/{bundlename}`, so for the 
 
 The `{cacheBreaker}` allows (forces?) you to easily skip each user's cache whenever you make changes. It is the 
 recommended approach to use to ensure all of your user's get the latest assets.
+
+## Including bundles in your HTML
+
+`Bundler::getTagsForBundle` helps you by outputting all the HTML tags required for a given bundle. It automatically
+keeps tracks of debug/production mode, and outputs the correct tags. It even handles the case were you have a Less
+file that needs compilation even in debug mode.
+
+If you are using a templating system such as Smarty, you may find the following snippet helpful:
+
+```php
+<?php
+$smarty->registerPlugin(
+    "function", 
+    "bundle", 
+    function(array $params) use (\DC\Bundler\Bundler $bundler) {
+        return $bundler->getTagsForBundle($params['name']);
+    });
+```
+
+Then you can easily use the bundles in your templates:
+
+```
+{bundle name="site.css"}
+```
+
+And it will result in the following HTML being produced in production:
+
+```html
+<link rel="stylesheet" type="text/css" src="/bundle/foo/site.css" />
+```
+
+And this is the result in debug:
+
+```html
+<link rel="stylesheet" type="text/css" src="/app/styles/bootstrap.css" />
+<link rel="stylesheet" type="text/css" src="/bundle/foo/site.css?part=app/styles/app.less" />
+```
+
+Woohoo, magic!
