@@ -11,7 +11,7 @@ class Rot13Transformer implements \DC\Bundler\ITransformer {
 
     function transform(\DC\Bundler\Content $content, $file = null)
     {
-        return new \DC\Bundler\Content("text/plain", str_rot13($content->getContent()));
+        return new \DC\Bundler\Content("application/javascript", str_rot13($content->getContent()));
     }
 
     /**
@@ -19,6 +19,6 @@ class Rot13Transformer implements \DC\Bundler\ITransformer {
      */
     function getOutputContentType()
     {
-        return "text/plain";
+        return "application/javascript";
     }
 }
