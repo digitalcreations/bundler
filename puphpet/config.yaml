@@ -3,15 +3,15 @@ vagrantfile:
     vm:
         box: puphpet/ubuntu1404-x64
         box_url: puphpet/ubuntu1404-x64
-        hostname: router-bundler.local
+        hostname: bundler.local
         memory: '512'
         cpus: '1'
         chosen_provider: virtualbox
         network:
-            private_network: 192.168.56.101
+            private_network: 192.168.56.102
             forwarded_port:
                 vflnp_g2tmwyb21pt3:
-                    host: '5977'
+                    host: '7041'
                     guest: '22'
         post_up_message: ''
         provider:
