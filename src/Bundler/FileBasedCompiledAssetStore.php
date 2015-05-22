@@ -26,7 +26,7 @@ class FileBasedCompiledAssetStore implements ICompiledAssetStore {
         $this->folder = rtrim($folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     }
 
-    function save($name, Content $content)
+    function save($name, array $content)
     {
         file_put_contents($this->folder . $name, serialize($content));
     }
@@ -42,8 +42,11 @@ class FileBasedCompiledAssetStore implements ICompiledAssetStore {
      */
     function getSaveTime($name)
     {
-        $dt = new \DateTime();
-        $dt->setTimestamp(filemtime($this->folder . $name));
-        return $dt;
+        if (file_exists($this->folder . $name)) {
+            $dt = new \DateTime();
+            $dt->setTimestamp(filemtime($this->folder . $name));
+            return $dt;
+        }
+        return null;
     }
 }
