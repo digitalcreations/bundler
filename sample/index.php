@@ -30,30 +30,18 @@ $config =
     ];
 
 $container = new \DC\IoC\Container();
-$container
-    ->register('\DC\Bundler\JSMin\JSMinTransformer')
-    ->to('\DC\Bundler\ITransformer');
-$container
-    ->register('\DC\Bundler\Less\LessTransformer')
-    ->to('\DC\Bundler\ITransformer');
-$container
-    ->register(function() {
-        // by providing no parameters, store files in system temp folder
-        return new \DC\Bundler\FileBasedCompiledAssetStore();
-    })
-    ->to('\DC\Bundler\ICompiledAssetStore');
-$container
-    ->register(
-        /**
-         * @param $transformers \DC\Bundler\ITransformer[]
-         */
-        function(\DC\Bundler\ICompiledAssetStore $assetStore, array $transformers) use ($config) {
-            return new \DC\Bundler\Bundler(
-                $config,
-                \DC\Bundler\Mode::Debug,
-                $assetStore,
-                $transformers);
-        })
-    ->to('\DC\Bundler\Bundler');
+
+
+\DC\Bundler\Less\LessTransformer::registerWithContainer($container);
+\DC\Bundler\JSMin\JSMinTransformer::registerWithContainer($container);
+\DC\Bundler\Bundler::registerWithContainer($container,
+    new \DC\Bundler\BundlerConfiguration($config, \DC\Bundler\Mode::Production, "bar"));
 
 \DC\Router\IoC\RouterSetup::route($container, ['\DC\Bundler\BundleController']);
+
+/*
+ * Try hitting http://bundler.local/bundle/whatever/site.css
+ *
+ * Then switch to Debug mode above, and try hitting
+ * http://bundler.local/bundle/whatever/site.css?part=app/styles/local.less
+ */

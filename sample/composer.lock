@@ -12,16 +12,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digitalcreations/bundler.git",
-                "reference": "8c1c3f6ad7e04e4d58e52affd6581001af6d968a"
+                "reference": "fbb3ae336403952dab2f7d842f12d6ceb9f3d764"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digitalcreations/bundler/zipball/8c1c3f6ad7e04e4d58e52affd6581001af6d968a",
-                "reference": "8c1c3f6ad7e04e4d58e52affd6581001af6d968a",
+                "url": "https://api.github.com/repos/digitalcreations/bundler/zipball/fbb3ae336403952dab2f7d842f12d6ceb9f3d764",
+                "reference": "fbb3ae336403952dab2f7d842f12d6ceb9f3d764",
                 "shasum": ""
             },
             "require": {
-                "dc/router": "0.*"
+                "dc/router": "*",
+                "dflydev/apache-mime-types": "*"
             },
             "require-dev": {
                 "phpunit/phpunit": "4.0.*"
@@ -50,7 +51,7 @@
             ],
             "description": "Asset bundling for dc/router",
             "homepage": "http://github.com/digitalcreations/bundler",
-            "time": "2015-05-21 10:45:35"
+            "time": "2015-05-22 12:43:38"
         },
         {
             "name": "dc/bundler-jsmin",
@@ -58,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digitalcreations/bundler-jsmin.git",
-                "reference": "8a6b27b981f964cf5519a2f071381b86bfb4778e"
+                "reference": "66fcf9ffa6573a2d16ae3d68763c40c12f8b9fc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digitalcreations/bundler-jsmin/zipball/8a6b27b981f964cf5519a2f071381b86bfb4778e",
-                "reference": "8a6b27b981f964cf5519a2f071381b86bfb4778e",
+                "url": "https://api.github.com/repos/digitalcreations/bundler-jsmin/zipball/66fcf9ffa6573a2d16ae3d68763c40c12f8b9fc1",
+                "reference": "66fcf9ffa6573a2d16ae3d68763c40c12f8b9fc1",
                 "shasum": ""
             },
             "require": {
@@ -97,7 +98,7 @@
             ],
             "description": "JSMin support for dc/bundler",
             "homepage": "http://github.com/digitalcreations/bundler-jsmin",
-            "time": "2015-05-21 12:39:01"
+            "time": "2015-05-22 12:33:31"
         },
         {
             "name": "dc/bundler-less",
@@ -105,12 +106,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digitalcreations/bundler-less.git",
-                "reference": "a7b9144f328868c58a571c0462dba28660cddc62"
+                "reference": "c261209b2ce73104bc15f6e1a1eddd780eb66550"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digitalcreations/bundler-less/zipball/a7b9144f328868c58a571c0462dba28660cddc62",
-                "reference": "a7b9144f328868c58a571c0462dba28660cddc62",
+                "url": "https://api.github.com/repos/digitalcreations/bundler-less/zipball/c261209b2ce73104bc15f6e1a1eddd780eb66550",
+                "reference": "c261209b2ce73104bc15f6e1a1eddd780eb66550",
                 "shasum": ""
             },
             "require": {
@@ -144,7 +145,7 @@
             ],
             "description": "LESS support for dc/bundler",
             "homepage": "http://github.com/digitalcreations/bundler-less",
-            "time": "2015-05-21 11:55:06"
+            "time": "2015-05-22 12:33:15"
         },
         {
             "name": "dc/ioc",
@@ -251,6 +252,61 @@
                 "routing"
             ],
             "time": "2014-11-20 08:20:05"
+        },
+        {
+            "name": "dflydev/apache-mime-types",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dflydev/dflydev-apache-mime-types.git",
+                "reference": "f30a57e59b7476e4c5270b6a0727d79c9c0eb861"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dflydev/dflydev-apache-mime-types/zipball/f30a57e59b7476e4c5270b6a0727d79c9c0eb861",
+                "reference": "f30a57e59b7476e4c5270b6a0727d79c9c0eb861",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "twig/twig": "1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Dflydev\\ApacheMimeTypes": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dragonfly Development Inc.",
+                    "email": "info@dflydev.com",
+                    "homepage": "http://dflydev.com"
+                },
+                {
+                    "name": "Beau Simensen",
+                    "email": "beau@dflydev.com",
+                    "homepage": "http://beausimensen.com"
+                }
+            ],
+            "description": "Apache MIME Types",
+            "keywords": [
+                "apache",
+                "mime",
+                "mimetypes"
+            ],
+            "time": "2013-05-14 02:02:01"
         },
         {
             "name": "linkorb/jsmin-php",
