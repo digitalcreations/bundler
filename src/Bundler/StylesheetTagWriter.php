@@ -9,7 +9,7 @@ class StylesheetTagWriter implements ITagWriter {
      */
     function getSupportedContentTypes()
     {
-        return "text/css";
+        return ["text/css"];
     }
 
     /**
