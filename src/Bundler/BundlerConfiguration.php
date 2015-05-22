@@ -24,7 +24,7 @@ class BundlerConfiguration {
         }
         elseif (is_string($bundles) && file_exists($bundles)) {
             $json = file_get_contents($bundles);
-            $this->bundles = json_decode($json);
+            $this->bundles = json_decode($json, true);
         }
         $this->mode = $mode;
         $this->cacheBreaker = $cacheBreaker;
