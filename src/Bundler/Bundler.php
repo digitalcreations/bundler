@@ -220,11 +220,11 @@ class Bundler {
     public static function registerWithContainer(\DC\IoC\Container $container, BundlerConfiguration $config) {
         $container->register(function() {
                 // by providing no parameters, store files in system temp folder
-                return new \DC\Bundler\FileBasedCompiledAssetStore();
+                return new \DC\Bundler\AssetStores\FileBasedCompiledAssetStore();
             })
             ->to('\DC\Bundler\ICompiledAssetStore');
-        $container->register('\DC\Bundler\JavascriptTagWriter')->to('\DC\Bundler\ITagWriter');
-        $container->register('\DC\Bundler\StylesheetTagWriter')->to('\DC\Bundler\ITagWriter');
+        $container->register('\DC\Bundler\TagWriters\JavascriptTagWriter')->to('\DC\Bundler\ITagWriter');
+        $container->register('\DC\Bundler\TagWriters\StylesheetTagWriter')->to('\DC\Bundler\ITagWriter');
         $container->register($config);
     }
 } 
