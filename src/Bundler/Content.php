@@ -25,6 +25,6 @@ class Content {
 
     function getContent() { return $this->content; }
     function getContentType() { return $this->contentType; }
-    function getPath() { return $this->getPath(); }
+    function getPath() { return $this->path; }
     function wasCompiled() { return $this->compiled; }
 }
