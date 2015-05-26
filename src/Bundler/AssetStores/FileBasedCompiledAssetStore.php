@@ -1,8 +1,8 @@
 <?php
 
-namespace DC\Bundler;
+namespace DC\Bundler\AssetStores;
 
-class FileBasedCompiledAssetStore implements ICompiledAssetStore {
+class FileBasedCompiledAssetStore implements \DC\Bundler\ICompiledAssetStore {
 
     /**
      * @var string

@@ -1,8 +1,8 @@
 <?php
 
-namespace DC\Bundler;
+namespace DC\Bundler\TagWriters;
 
-class StylesheetTagWriter implements ITagWriter {
+class StylesheetTagWriter implements \DC\Bundler\ITagWriter {
 
     /**
      * @return string[] The supported MIME types.

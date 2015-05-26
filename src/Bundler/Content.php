@@ -10,15 +10,21 @@ class Content {
      * @var bool
      */
     private $compiled;
+    /**
+     * @var null
+     */
+    private $path;
 
-    function __construct($contentType, $content, $compiled = true)
+    function __construct($contentType, $content, $path = null, $compiled = true)
     {
         $this->contentType = $contentType;
         $this->content = $content;
         $this->compiled = $compiled;
+        $this->path = $path;
     }
 
     function getContent() { return $this->content; }
     function getContentType() { return $this->contentType; }
+    function getPath() { return $this->getPath(); }
     function wasCompiled() { return $this->compiled; }
 }

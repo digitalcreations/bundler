@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digitalcreations/bundler.git",
-                "reference": "fbb3ae336403952dab2f7d842f12d6ceb9f3d764"
+                "reference": "1421cd12c39104cc8ed62bd346cc47ec6818b643"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digitalcreations/bundler/zipball/fbb3ae336403952dab2f7d842f12d6ceb9f3d764",
-                "reference": "fbb3ae336403952dab2f7d842f12d6ceb9f3d764",
+                "url": "https://api.github.com/repos/digitalcreations/bundler/zipball/1421cd12c39104cc8ed62bd346cc47ec6818b643",
+                "reference": "1421cd12c39104cc8ed62bd346cc47ec6818b643",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
             ],
             "description": "Asset bundling for dc/router",
             "homepage": "http://github.com/digitalcreations/bundler",
-            "time": "2015-05-22 12:43:38"
+            "time": "2015-05-22 13:22:53"
         },
         {
             "name": "dc/bundler-jsmin",

@@ -2,8 +2,6 @@
 
 namespace DC\Bundler;
 
-use DC\Bundler\Exceptions\InvalidConfigurationException;
-
 class Bundler {
     /**
      * @var BundlerConfiguration
@@ -27,7 +25,7 @@ class Bundler {
      * @param $assetStore \DC\Bundler\ICompiledAssetStore
      * @param $transformers \DC\Bundler\ITransformer[]
      * @param $tagWriters \DC\Bundler\ITagWriter[]
-     * @throws Exceptions\InvalidConfigurationException
+     * @throws \DC\Bundler\Exceptions\InvalidConfigurationException
      */
     function __construct(BundlerConfiguration $config,
                          ICompiledAssetStore $assetStore = null,
@@ -38,7 +36,7 @@ class Bundler {
 
         $this->assetStore = $assetStore;
         if ($assetStore == null) {
-            $this->assetStore = new FileBasedCompiledAssetStore();
+            $this->assetStore = new AssetStores\FileBasedCompiledAssetStore();
         }
 
         $this->transformers = [];
@@ -48,9 +46,13 @@ class Bundler {
             }
         }
 
+        if (!isset($this->transformers["bundle"])) {
+            $this->transformers["bundle"] = new Transformers\BundleTransformer();
+        }
+
         $this->tagWriters = [];
         if (!is_array($tagWriters)) {
-            $tagWriters = [new JavascriptTagWriter(), new StylesheetTagWriter()];
+            $tagWriters = [new TagWriters\JavascriptTagWriter(), new TagWriters\StylesheetTagWriter()];
         }
         array_walk($tagWriters, function(ITagWriter $tagWriter) {
             $types = $tagWriter->getSupportedContentTypes();
@@ -125,37 +127,6 @@ class Bundler {
         return $latestModified > $saved->getTimestamp();
     }
 
-    private static function flatten(array $array) {
-        $result = array();
-        foreach($array as $key=>$value) {
-            if(is_array($value)) {
-                $result = $result + self::flatten($value);
-            }
-            else {
-                $result[$key] = $value;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * @param Content[] $contents
-     * @return Content
-     * @throws InvalidConfigurationException
-     */
-    private function mergeContentsInternal(array $contents) {
-        if (count($contents) == 0 || $contents == null) {
-            return null;
-        }
-        $flatContents = self::flatten($contents);
-        $outputText = array_map(function(Content $c) { return $c->getContent(); }, $flatContents);
-        $types = array_values(array_unique(array_map(function(Content $c) { return $c->getContentType(); }, $flatContents)));
-        if (count($types) !== 1) {
-            throw new InvalidConfigurationException("Nodes have different content types, cannot merge.");
-        }
-        return new Content($types[0], implode('', $outputText));
-    }
-
     private function getContentInternal($node) {
         if (!isset($node[Node::Transform])) {
             $transform = ["bundle"];
@@ -166,6 +137,7 @@ class Bundler {
         else {
             $transform = $node[Node::Transform];
         }
+
         $isDebug = $this->getMode() == Mode::Debug;
 
         $files = $this->getFileListInternal($node, false);
@@ -174,7 +146,11 @@ class Bundler {
         foreach ($files as $file) {
             if (is_string($file)) {
                 $mimeRepos = new \Dflydev\ApacheMimeTypes\FlatRepository();
-                $contents[$file] = new Content($mimeRepos->findType(pathinfo($file, PATHINFO_EXTENSION)), file_get_contents($file), false);
+                $contents[$file] = new Content(
+                    $mimeRepos->findType(pathinfo($file, PATHINFO_EXTENSION)),
+                    file_get_contents($file),
+                    str_replace($this->getWebroot() . DIRECTORY_SEPARATOR, '', $file),
+                    false);
             }
             else {
                 $contents[sha1(microtime())] = $this->getContentInternal($file);
@@ -183,21 +159,28 @@ class Bundler {
 
         // apply transforms to our files
         foreach ($transform as $transformName) {
-            if (!$isDebug && $transformName == "bundle") {
-                $contents = [$this->mergeContentsInternal($contents)];
-            }
-            elseif (isset($this->transformers[$transformName])) {
+            if (isset($this->transformers[$transformName])) {
                 $transformer = $this->transformers[$transformName];
                 if ($isDebug && !$transformer->runInDebugMode()) {
                     continue;
                 }
-                foreach ($contents as $file => $content) {
-                    $contents[$file] = $transformer->transform($content, $file);
+                if ($transformer instanceof IMultiFileTransformer) {
+                    $contents = [$transformer->transformMultiple($contents)];
                 }
+                else {
+                    foreach ($contents as $file => $content) {
+                        $contents[$file] = $transformer->transform($content, $file);
+                    }
+                }
+            }
+            else {
+                throw new Exceptions\InvalidTransformerException();
             }
         }
 
-        return $isDebug ? $contents : [$this->mergeContentsInternal($contents)];
+        return $isDebug
+            ? $contents
+            : [$this->transformers["bundle"]->transformMultiple($contents)];
     }
 
     public function getTagsForBundle($name) {
@@ -227,7 +210,7 @@ class Bundler {
      */
     public function compile($name) {
         if ($this->needsRecompile($name)) {
-            $content = self::flatten($this->getContentInternal($this->config->getBundles()[$name]));
+            $content = ArrayHelper::flatten($this->getContentInternal($this->config->getBundles()[$name]));
             $this->assetStore->save($this->getSaveName($name), $content);
             return $content;
         }

@@ -2,8 +2,6 @@
 
 namespace DC\Tests\Bundler;
 
-use DC\Bundler\BundlerConfiguration;
-
 class BundlerTest extends \PHPUnit_Framework_TestCase {
     protected function setUp()
     {
@@ -55,6 +53,13 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
                 "watch" => [
                     "js/test2.js"
                 ]
+            ],
+            'multifile' => [
+                "transform" => ["reverse-bundle"],
+                "parts" => [
+                    "js/test1.js",
+                    "js/test2.js"
+                ]
             ]
         ];
     }
@@ -64,13 +69,13 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetFileListForBundle_missingFileTriggersWarning() {
         $bundler = new \DC\Bundler\Bundler(
-            new BundlerConfiguration($this->getTestBundles()));
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles()));
         $bundler->getFileListForBundle('missing');
     }
 
     public function testGetFileListForBundle_ReturnsCorrectList() {
         $bundler = new \DC\Bundler\Bundler(
-            new BundlerConfiguration($this->getTestBundles()));
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles()));
         $files = $bundler->getFileListForBundle('completeGlob');
         $this->assertContains($this->root . "/js/test1.js", $files);
         $this->assertContains($this->root . "/js/test2.js", $files);
@@ -78,7 +83,7 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetFileListForBundle_nestedBundle_returnsCorrectList() {
         $bundler = new \DC\Bundler\Bundler(
-            new BundlerConfiguration($this->getTestBundles()));
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles()));
         $files = $bundler->getFileListForBundle('withNestedTransform');
         $this->assertContains($this->root . "/js/test1.js", $files);
         $this->assertContains($this->root . "/js/test2.js", $files);
@@ -181,5 +186,20 @@ class BundlerTest extends \PHPUnit_Framework_TestCase {
             [new Rot13Transformer()]);
         $content = $bundler->compile('withNestedTransform');
         $this->assertEquals("console.log('test1.js');pbafbyr.ybt('grfg2.wf');", $content[0]->getContent());
+    }
+
+    public function testGetContent_multiFileBundle_isCompiledBundledAndReturned() {
+        $mockAssetStore = $this->getMock('\DC\Bundler\ICompiledAssetStore');
+        $mockAssetStore
+            ->expects($this->once())
+            ->method('getSaveTime')
+            ->willReturn(new \DateTime('2015-01-01'));
+
+        $bundler = new \DC\Bundler\Bundler(
+            new \DC\Bundler\BundlerConfiguration($this->getTestBundles(), \DC\Bundler\Mode::Production),
+            $mockAssetStore,
+            [new ReverseBundlerTransformer()]);
+        $content = $bundler->compile('multifile');
+        $this->assertEquals(";)'sj.1tset'(gol.elosnoc;)'sj.2tset'(gol.elosnoc", $content[0]->getContent());
     }
 }
