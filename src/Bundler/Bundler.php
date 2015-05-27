@@ -164,6 +164,7 @@ class Bundler {
                 if ($isDebug && !$transformer->runInDebugMode()) {
                     continue;
                 }
+
                 if ($transformer instanceof IMultiFileTransformer) {
                     $contents = [$transformer->transformMultiple($contents)];
                 }
@@ -191,6 +192,9 @@ class Bundler {
                 $path = str_replace($this->getWebroot(), '', $path);
                 if ($c->wasCompiled()) {
                     $path = '/bundle/' . $this->config->getCacheBreaker() . '/' . $name .'?part=' . htmlentities($path);
+                }
+                if (!isset($this->tagWriters[$c->getContentType()])) {
+                    continue;
                 }
                 $tagWriter = $this->tagWriters[$c->getContentType()];
                 $tags[] = $tagWriter->getTagForPath($path);
