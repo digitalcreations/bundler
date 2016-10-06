@@ -21,10 +21,10 @@ class Bundler {
     private $tagWriters;
 
     /**
-     * @param $config \DC\Bundler\BundlerConfiguration The configuration
-     * @param $assetStore \DC\Bundler\ICompiledAssetStore
-     * @param $transformers \DC\Bundler\ITransformer[]
-     * @param $tagWriters \DC\Bundler\ITagWriter[]
+     * @param \DC\Bundler\BundlerConfiguration $config The configuration
+     * @param \DC\Bundler\ICompiledAssetStore $assetStore
+     * @param \DC\Bundler\ITransformer[] $transformers
+     * @param \DC\Bundler\ITagWriter[] $tagWriters
      * @throws \DC\Bundler\Exceptions\InvalidConfigurationException
      */
     function __construct(BundlerConfiguration $config,
