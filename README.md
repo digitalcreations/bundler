@@ -72,7 +72,7 @@ write a new bundle here (see Nested bundles below).
 When including files you specify a `glob` expression relative to the web root. Here are some samples:
 
 - `app/app.js` &mdash; just the `app.js` file in the `app` directory.
-- `app/directives/*.js' &mdash; all `.js` files in `app/directives`. You knew that already.
+- `app/directives/*.js` &mdash; all `.js` files in `app/directives`. You knew that already.
 - `app/templates/**/*.html` &mdash; all `.html` files in any subfolder of `app/templates`. 
 
 The **watch** specifies additional files to be watched for changes to determine if the bundle needs to be recompiled.
