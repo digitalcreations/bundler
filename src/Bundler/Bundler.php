@@ -153,7 +153,10 @@ class Bundler {
                     false);
             }
             else {
-                $contents[sha1(microtime())] = $this->getContentInternal($file);
+                $nestedContents = $this->getContentInternal($file);
+                foreach ($nestedContents as $nestedContent) {
+                    $contents[sha1(microtime() . mt_rand(0, PHP_INT_MAX))] = $nestedContent;
+                }
             }
         }
 
