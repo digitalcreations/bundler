@@ -21,19 +21,27 @@ class Bundler {
     private $tagWriters;
 
     /**
+     * @var IBundleWriter
+     */
+    private $bundleWriter;
+
+    /**
      * @param \DC\Bundler\BundlerConfiguration $config The configuration
      * @param \DC\Bundler\ICompiledAssetStore $assetStore
+     * @param \DC\Bundler\IBundleWriter $bundleWriter
      * @param \DC\Bundler\ITransformer[] $transformers
      * @param \DC\Bundler\ITagWriter[] $tagWriters
      * @throws \DC\Bundler\Exceptions\InvalidConfigurationException
      */
     function __construct(BundlerConfiguration $config,
                          ICompiledAssetStore $assetStore = null,
+                         IBundleWriter $bundleWriter = null,
                          array $transformers = null,
                          array $tagWriters = null)
     {
         $this->config = $config;
 
+        $this->bundleWriter = $bundleWriter;
         $this->assetStore = $assetStore;
         if ($assetStore == null) {
             $this->assetStore = new AssetStores\FileBasedCompiledAssetStore();
@@ -110,7 +118,7 @@ class Bundler {
     }
 
     private function getSaveName($name) {
-        return $this->config->getMode() . $name;
+        return $name; //$this->config->getMode() . $name;
     }
 
     public function needsRecompile($name) {
@@ -182,9 +190,14 @@ class Bundler {
             }
         }
 
-        return $isDebug
-            ? $contents
-            : [$this->transformers["bundle"]->transformMultiple($contents)];
+        if ($isDebug) {
+            return $contents;
+        }
+        else {
+            /** @var Content $bundle */
+            $bundle = $this->transformers["bundle"]->transformMultiple($contents);
+            return [$bundle];
+        }
     }
 
     public function getTagsForBundle($name) {
@@ -219,6 +232,11 @@ class Bundler {
         if ($this->needsRecompile($name)) {
             $content = ArrayHelper::flatten($this->getContentInternal($this->config->getBundles()[$name]));
             $this->assetStore->save($this->getSaveName($name), $content);
+
+            if (count($content) === 1 && $this->getMode() == Mode::Production && $this->bundleWriter != null) {
+                $this->bundleWriter->writeBundle($this->getWebroot(), $name, reset($content)->getContent());
+            }
+
             return $content;
         }
         return $this->assetStore->get($this->getSaveName($name));
@@ -232,6 +250,7 @@ class Bundler {
             ->to('\DC\Bundler\ICompiledAssetStore');
         $container->register('\DC\Bundler\TagWriters\JavascriptTagWriter')->to('\DC\Bundler\ITagWriter');
         $container->register('\DC\Bundler\TagWriters\StylesheetTagWriter')->to('\DC\Bundler\ITagWriter');
+        $container->register('\DC\Bundler\DefaultBundleWriter')->to('\DC\Bundler\IBundleWriter');
         $container->register($config);
     }
 } 

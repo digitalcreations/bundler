@@ -17,7 +17,12 @@ class BundlerConfiguration {
      */
     private $mode;
 
-    function __construct($bundles, $mode = Mode::Debug, $cacheBreaker = "_")
+    /**
+     * @var string
+     */
+    private $storageFolder;
+
+    function __construct($bundles, $mode = Mode::Debug, $cacheBreaker = "_", $storageFolder = null)
     {
         if (is_array($bundles)) {
             $this->bundles = $bundles;
@@ -28,6 +33,7 @@ class BundlerConfiguration {
         }
         $this->mode = $mode;
         $this->cacheBreaker = $cacheBreaker;
+        $this->storageFolder = $storageFolder;
 
         if (!isset($this->bundles[Node::WebRoot])) {
             throw new \DC\Bundler\Exceptions\InvalidConfigurationException("Could not locate root folder. Add __webroot to configuration.");
@@ -56,6 +62,11 @@ class BundlerConfiguration {
     public function getCacheBreaker()
     {
         return $this->cacheBreaker;
+    }
+
+    public function getStorageFolder()
+    {
+        return $this->storageFolder;
     }
 
     /**
